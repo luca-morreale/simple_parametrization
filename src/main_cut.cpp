@@ -119,9 +119,9 @@ void write_obj(std::ofstream &out, SeamMesh &mesh, UV_pmap &uv_pm)
     // save vertices and texture coordinates
     boost::property_map<SeamMesh, CGAL::vertex_point_t>::type vpm = get(CGAL::vertex_point, mesh);
     boost::graph_traits<SeamMesh>::vertex_iterator vb, ve;
-    for(boost::tie(vb, ve) = mesh.vertices(); vb != ve; ++vb)
+    for(boost::tie(vb, ve) = vertices(mesh); vb != ve; ++vb)
     {
-        vertex_descriptor vd = *vb++;
+        vertex_descriptor vd = *vb;
         halfedge_descriptor hd = halfedge(vd, mesh);
         
         auto pt = get(vpm, target(hd, mesh));
@@ -129,9 +129,9 @@ void write_obj(std::ofstream &out, SeamMesh &mesh, UV_pmap &uv_pm)
         auto uv = get(uv_pm, hd);
         out << "v "  << pt << std::endl;
         out << "vt " << uv << std::endl;
-        
+
         // set index to vertices
-        put(vimap, source(hd, mesh), vertices_counter++);
+        put(vimap, vd, vertices_counter++);
     }
 
     // faces
