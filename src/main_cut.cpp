@@ -54,8 +54,8 @@ void write_obj(std::ofstream &out, SeamMesh &mesh, UV_pmap &uv_pm);
 
 int main(int argc, char** argv)
 {
-        if (argc < 1) {
-        std::cout << "ERROR! File name missing." << std::endl;
+        if (argc < 3) {
+        std::cerr << "ERROR! Files name missing." << std::endl;
         return 1;
     }
     
@@ -69,6 +69,11 @@ int main(int argc, char** argv)
     PolyMesh sm;
     in >> sm;
     
+    if (sm.empty()) {
+        std::cerr << "Empty Polyhedron, your model might not be manifold." << std::endl;
+        return 1;
+    }
+        
     // create seam mesh object
     Seam_edge_uhm seam_edge_uhm(false);
     Seam_edge_pmap seam_edge_pm(seam_edge_uhm);
@@ -79,7 +84,7 @@ int main(int argc, char** argv)
     SeamMesh mesh(sm, seam_edge_pm, seam_vertex_pm);
     
     // read seam from file
-    const char* filename = (argc>2) ? argv[2] : "lion.selection.txt";
+    const char* filename = argv[2];
     SM_halfedge_descriptor smhd = mesh.add_seams(filename);
     if(smhd == SM_halfedge_descriptor() ) {
         std::cerr << "Warning: No seams in input" << std::endl;
@@ -120,12 +125,13 @@ void write_obj(std::ofstream &out, SeamMesh &mesh, UV_pmap &uv_pm)
         halfedge_descriptor hd = halfedge(vd, mesh);
         
         auto pt = get(vpm, target(hd, mesh));
+        //auto pt = get(vpm, source(hd, mesh));
         auto uv = get(uv_pm, hd);
         out << "v "  << pt << std::endl;
         out << "vt " << uv << std::endl;
         
         // set index to vertices
-        put(vimap, vd, vertices_counter++);
+        put(vimap, source(hd, mesh), vertices_counter++);
     }
 
     // faces

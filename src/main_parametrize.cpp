@@ -34,7 +34,7 @@ void write_obj(std::ofstream &out, SurfaceMesh & sm, UV_pmap uv_map);
 
 int main(int argc, char** argv)
 {
-    if (argc < 1) {
+    if (argc < 2) {
         std::cout << "ERROR! File name missing." << std::endl;
         return 1;
     }
