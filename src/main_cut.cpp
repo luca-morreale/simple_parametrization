@@ -12,6 +12,9 @@
 #include <CGAL/Inverse_index.h>
 #include <iostream>
 #include <fstream>
+#include <sstream>
+
+#include <CGAL/Surface_mesh_parameterization/ARAP_parameterizer_3.h>
 
 #include <CGAL/IO/OFF_reader.h>
 
@@ -50,7 +53,20 @@ namespace SMP = CGAL::Surface_mesh_parameterization;
 typedef SMP::Square_border_uniform_parameterizer_3<SeamMesh>  Border_parameterizer;
 typedef SMP::Barycentric_mapping_parameterizer_3<SeamMesh, Border_parameterizer> Parameterizer;
 
+
+struct Compute_area:
+  public std::unary_function<const PolyMesh::Facet, double>
+{
+  double operator()(const PolyMesh::Facet& f) const{
+    return Kernel::Compute_area_3()(
+      f.halfedge()->vertex()->point(),
+      f.halfedge()->next()->vertex()->point(),
+      f.halfedge()->opposite()->vertex()->point() );
+  }
+};
+
 void write_obj(std::ofstream &out, SeamMesh &mesh, UV_pmap &uv_pm);
+void check_facets_area(SeamMesh &mesh, UV_pmap &uv_pm, halfedge_descriptor &bhd);
 
 int main(int argc, char** argv)
 {
@@ -59,6 +75,7 @@ int main(int argc, char** argv)
         return 1;
     }
     
+    std::string file(argv[1]);
     std::ifstream in(argv[1]);
     if(!in) {
         std::cerr << "Problem loading the input data" << std::endl;
@@ -102,10 +119,12 @@ int main(int argc, char** argv)
     SMP::parameterize(mesh, param, bhd, uv_pm);
 
     // save mesh parametrized
-    std::ofstream out("result_mesh.obj");
+    std::string out_file = file.substr(0, file.size()-4) + "_cut.obj";
+    std::ofstream out(out_file);
     write_obj(out, mesh, uv_pm);
     
-
+    check_facets_area(mesh, uv_pm, bhd);
+    
     return EXIT_SUCCESS;
 
 }
@@ -126,9 +145,9 @@ void write_obj(std::ofstream &out, SeamMesh &mesh, UV_pmap &uv_pm)
         
         auto pt = get(vpm, target(hd, mesh));
         //auto pt = get(vpm, source(hd, mesh));
-        auto uv = get(uv_pm, hd);
+        auto uv = get(uv_pm, hd); 
         out << "v "  << pt << std::endl;
-        out << "vt " << uv << std::endl;
+        out << "vt " << -(uv.x()* 2.0 - 1.0) << " " << (uv.y()* 2.0 - 1.0) << std::endl;
 
         // set index to vertices
         put(vimap, vd, vertices_counter++);
@@ -146,3 +165,26 @@ void write_obj(std::ofstream &out, SeamMesh &mesh, UV_pmap &uv_pm)
     }
 }
 
+
+void check_facets_area(SeamMesh &mesh, UV_pmap &uv_pm, halfedge_descriptor &bhd)
+{
+    std::stringstream out;
+    SMP::IO::output_uvmap_to_off(mesh, bhd, uv_pm, out);
+    
+    PolyMesh tmp;
+    out >> tmp;
+    
+    Compute_area ca;
+    std::size_t num_null_faces = 0;
+
+    for (auto it = tmp.facets_begin(); it != tmp.facets_end(); it++) {
+        if (ca(*it) == 0.0) {
+            num_null_faces++;
+        }
+    }
+    
+    if (num_null_faces > 0) {
+        std::cerr << "WARNING: " << num_null_faces << " faces have 0 area!" << std::endl;
+    }
+
+}
