@@ -1,4 +1,4 @@
-project(OptimalViewEstimator)
+project(parametrization)
 cmake_minimum_required(VERSION 2.8.3)
 
 # ----------------------- LIBRARIES ---------------------------
@@ -40,11 +40,21 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fpermissive")
 # ------------------------ BUILD -------------------------------
 
 
-add_executable(parametrize src/main_parametrize.cpp)
-target_link_libraries(parametrize ${GMPXX_LIBRARIES} ${GMP_LIBRARIES} ${CGAL_LIBRARY} ${Boost_LIBRARIES} )
+add_executable(tutte src/main_tutte.cpp)
+target_link_libraries(tutte ${GMPXX_LIBRARIES} ${GMP_LIBRARIES} ${CGAL_LIBRARY} ${Boost_LIBRARIES} )
 
 
 add_executable(cut src/main_cut.cpp)
 target_link_libraries(cut ${GMPXX_LIBRARIES} ${GMP_LIBRARIES} ${CGAL_LIBRARY} ${Boost_LIBRARIES} )
 
 
+add_executable(slim src/main_slim.cpp)
+target_link_libraries(slim ${GMPXX_LIBRARIES} ${GMP_LIBRARIES} ${CGAL_LIBRARY} ${Boost_LIBRARIES} )
+
+
+add_executable(freeslim src/main_free_slim.cpp)
+target_link_libraries(freeslim ${GMPXX_LIBRARIES} ${GMP_LIBRARIES} ${CGAL_LIBRARY} ${Boost_LIBRARIES} )
+
+
+add_executable(dijkstra_seam src/main_dijkstra_seam.cpp)
+target_link_libraries(dijkstra_seam ${GMPXX_LIBRARIES} ${GMP_LIBRARIES} ${CGAL_LIBRARY} ${Boost_LIBRARIES} )
