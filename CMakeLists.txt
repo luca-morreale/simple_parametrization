@@ -1,9 +1,11 @@
-project(parametrization)
 cmake_minimum_required(VERSION 2.8.3)
+project(parametrization)
 
 # ----------------------- LIBRARIES ---------------------------
 
 set(CMAKE_CXX_STANDARD 14)
+
+list(PREPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
 
 #set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake/)
 set(CMAKE_BUILD_TYPE "Release")
@@ -32,6 +34,9 @@ include_directories(${EIGEN3_INCLUDE_DIR}
                       )
 include_directories(${Boost_INCLUDE_DIR})
 include_directories(include/)
+include(libigl)
+
+igl_include(glfw)
 
 # ----------------------- GCC FLAGS ----------------------------
 
@@ -49,11 +54,11 @@ target_link_libraries(cut ${GMPXX_LIBRARIES} ${GMP_LIBRARIES} ${CGAL_LIBRARY} ${
 
 
 add_executable(slim src/main_slim.cpp)
-target_link_libraries(slim ${GMPXX_LIBRARIES} ${GMP_LIBRARIES} ${CGAL_LIBRARY} ${Boost_LIBRARIES} )
+target_link_libraries(slim ${GMPXX_LIBRARIES} ${GMP_LIBRARIES} ${CGAL_LIBRARY} ${Boost_LIBRARIES} igl::glfw )
 
 
 add_executable(freeslim src/main_free_slim.cpp)
-target_link_libraries(freeslim ${GMPXX_LIBRARIES} ${GMP_LIBRARIES} ${CGAL_LIBRARY} ${Boost_LIBRARIES} )
+target_link_libraries(freeslim ${GMPXX_LIBRARIES} ${GMP_LIBRARIES} ${CGAL_LIBRARY} ${Boost_LIBRARIES} igl::glfw )
 
 
 add_executable(dijkstra_seam src/main_dijkstra_seam.cpp)
