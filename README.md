@@ -18,13 +18,6 @@ Other dependencies:
 - gmp
 - cmake
 
-To install libigl is it enough to link it to inside the `include` folder:
-```sh
-mkdir include
-cd include
-ln -s /your/path/to/libigl/include/igl igl
-ln -s /your/path/to/libigl/external/glad/include/glad glad
-```
 
 ## Compile
 ```sh
@@ -32,6 +25,8 @@ mkdir build
 cd build
 cmake .. && make -j4
 ```
+
+If an error regarding "COMP0048 version" appears then please edit `build/_deps/libigl-src/CMakeLists.txt` commenting out ligigl version.
 
 ## SLIM
 SLIM parametrization can be compute with:
