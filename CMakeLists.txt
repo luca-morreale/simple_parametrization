@@ -1,11 +1,9 @@
-cmake_minimum_required(VERSION 2.8.3)
 project(parametrization)
+cmake_minimum_required(VERSION 2.8.3)
 
 # ----------------------- LIBRARIES ---------------------------
 
 set(CMAKE_CXX_STANDARD 14)
-
-list(PREPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
 
 #set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake/)
 set(CMAKE_BUILD_TYPE "Release")
@@ -26,7 +24,12 @@ if (OPENMP_FOUND)
     set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
 endif()
 
+
+
+
+
 # ----------------------- INCLUDES ----------------------------
+list(PREPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
 
 include_directories(${EIGEN3_INCLUDE_DIR}
                       ${GMPXX_INCLUDE_DIR}
@@ -34,8 +37,8 @@ include_directories(${EIGEN3_INCLUDE_DIR}
                       )
 include_directories(${Boost_INCLUDE_DIR})
 include_directories(include/)
-include(libigl)
 
+include(libigl)
 igl_include(glfw)
 
 # ----------------------- GCC FLAGS ----------------------------
@@ -56,6 +59,9 @@ target_link_libraries(cut ${GMPXX_LIBRARIES} ${GMP_LIBRARIES} ${CGAL_LIBRARY} ${
 add_executable(slim src/main_slim.cpp)
 target_link_libraries(slim ${GMPXX_LIBRARIES} ${GMP_LIBRARIES} ${CGAL_LIBRARY} ${Boost_LIBRARIES} igl::glfw )
 
+add_executable(slim_bnd src/main_slim_bnd.cpp)
+target_link_libraries(slim_bnd ${GMPXX_LIBRARIES} ${GMP_LIBRARIES} ${CGAL_LIBRARY} ${Boost_LIBRARIES} igl::glfw )
+
 
 add_executable(freeslim src/main_free_slim.cpp)
 target_link_libraries(freeslim ${GMPXX_LIBRARIES} ${GMP_LIBRARIES} ${CGAL_LIBRARY} ${Boost_LIBRARIES} igl::glfw )
@@ -63,3 +69,4 @@ target_link_libraries(freeslim ${GMPXX_LIBRARIES} ${GMP_LIBRARIES} ${CGAL_LIBRAR
 
 add_executable(dijkstra_seam src/main_dijkstra_seam.cpp)
 target_link_libraries(dijkstra_seam ${GMPXX_LIBRARIES} ${GMP_LIBRARIES} ${CGAL_LIBRARY} ${Boost_LIBRARIES} )
+
