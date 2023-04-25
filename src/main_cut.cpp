@@ -16,7 +16,7 @@
 
 #include <CGAL/Surface_mesh_parameterization/ARAP_parameterizer_3.h>
 
-#include <CGAL/IO/OFF_reader.h>
+// #include <CGAL/IO/OFF_reader.h>
 
 #include <CGAL/Surface_mesh_parameterization/internal/Containers_filler.h>
 #include <CGAL/Polygon_mesh_processing/connected_components.h>
@@ -74,46 +74,46 @@ int main(int argc, char** argv)
         std::cerr << "ERROR! Files name missing." << std::endl;
         return 1;
     }
-    
+
     std::string file(argv[1]);
     std::ifstream in(argv[1]);
     if(!in) {
         std::cerr << "Problem loading the input data" << std::endl;
         return EXIT_FAILURE;
     }
-    
+
     // read mesh
     PolyMesh sm;
     in >> sm;
-    
+
     if (sm.empty()) {
         std::cerr << "Empty Polyhedron, your model might not be manifold." << std::endl;
         return 1;
     }
-        
+
     // create seam mesh object
     Seam_edge_uhm seam_edge_uhm(false);
     Seam_edge_pmap seam_edge_pm(seam_edge_uhm);
-    
+
     Seam_vertex_uhm seam_vertex_uhm(false);
     Seam_vertex_pmap seam_vertex_pm(seam_vertex_uhm);
-    
+
     SeamMesh mesh(sm, seam_edge_pm, seam_vertex_pm);
-    
+
     // read seam from file
     const char* filename = argv[2];
     SM_halfedge_descriptor smhd = mesh.add_seams(filename);
     if(smhd == SM_halfedge_descriptor() ) {
         std::cerr << "Warning: No seams in input" << std::endl;
     }
-    
+
     // A halfedge on the (possibly virtual) border
     halfedge_descriptor bhd = CGAL::Polygon_mesh_processing::longest_border(mesh, CGAL::Polygon_mesh_processing::parameters::all_default()).first;
-    
+
     // create parametrization map
     UV_uhm uv_uhm;
     UV_pmap uv_pm(uv_uhm);
-        
+
     // parametrization
     Parameterizer param = Parameterizer();
     SMP::parameterize(mesh, param, bhd, uv_pm);
@@ -122,9 +122,9 @@ int main(int argc, char** argv)
     std::string out_file = file.substr(0, file.size()-4) + "_cut.obj";
     std::ofstream out(out_file);
     write_obj(out, mesh, uv_pm);
-    
+
     check_facets_area(mesh, uv_pm, bhd);
-    
+
     return EXIT_SUCCESS;
 
 }
@@ -134,7 +134,7 @@ void write_obj(std::ofstream &out, SeamMesh &mesh, UV_pmap &uv_pm)
     Vertex_index_map vium;
     boost::associative_property_map<Vertex_index_map> vimap(vium);
     std::size_t vertices_counter = 0, faces_counter = 0;
-    
+
     // save vertices and texture coordinates
     boost::property_map<SeamMesh, CGAL::vertex_point_t>::type vpm = get(CGAL::vertex_point, mesh);
     boost::graph_traits<SeamMesh>::vertex_iterator vb, ve;
@@ -142,10 +142,10 @@ void write_obj(std::ofstream &out, SeamMesh &mesh, UV_pmap &uv_pm)
     {
         vertex_descriptor vd = *vb;
         halfedge_descriptor hd = halfedge(vd, mesh);
-        
+
         auto pt = get(vpm, target(hd, mesh));
         //auto pt = get(vpm, source(hd, mesh));
-        auto uv = get(uv_pm, hd); 
+        auto uv = get(uv_pm, hd);
         out << "v "  << pt << std::endl;
         out << "vt " << -(uv.x()* 2.0 - 1.0) << " " << (uv.y()* 2.0 - 1.0) << std::endl;
 
@@ -170,10 +170,10 @@ void check_facets_area(SeamMesh &mesh, UV_pmap &uv_pm, halfedge_descriptor &bhd)
 {
     std::stringstream out;
     SMP::IO::output_uvmap_to_off(mesh, bhd, uv_pm, out);
-    
+
     PolyMesh tmp;
     out >> tmp;
-    
+
     Compute_area ca;
     std::size_t num_null_faces = 0;
 
@@ -182,7 +182,7 @@ void check_facets_area(SeamMesh &mesh, UV_pmap &uv_pm, halfedge_descriptor &bhd)
             num_null_faces++;
         }
     }
-    
+
     if (num_null_faces > 0) {
         std::cerr << "WARNING: " << num_null_faces << " faces have 0 area!" << std::endl;
     }
