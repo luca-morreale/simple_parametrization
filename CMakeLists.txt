@@ -24,7 +24,7 @@ if (OPENMP_FOUND)
     set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
 endif()
 
-
+cmake_policy(SET CMP0048 NEW)
 
 
 
@@ -70,3 +70,6 @@ target_link_libraries(freeslim ${GMPXX_LIBRARIES} ${GMP_LIBRARIES} ${CGAL_LIBRAR
 add_executable(dijkstra_seam src/main_dijkstra_seam.cpp)
 target_link_libraries(dijkstra_seam ${GMPXX_LIBRARIES} ${GMP_LIBRARIES} ${CGAL_LIBRARY} ${Boost_LIBRARIES} )
 
+
+add_executable(geodesic src/main_geodesic.cpp)
+target_link_libraries(geodesic ${GMPXX_LIBRARIES} ${GMP_LIBRARIES} ${CGAL_LIBRARY} ${Boost_LIBRARIES} )
