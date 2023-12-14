@@ -86,6 +86,7 @@ int main(int argc, char** argv) {
     double w0_s, w1_s, w2_s;
     double w0_t, w1_t, w2_t;
     std::ifstream evaluation_file(queries_path);
+
     while (evaluation_file >> fidx_s >> w0_s >> w1_s >> w2_s >> fidx_t >> w0_t >> w1_t >> w2_t) {
         face_idx_s.push_back(fidx_s);
         face_idx_t.push_back(fidx_t);
@@ -127,6 +128,7 @@ int main(int argc, char** argv) {
         // move it to the target face
         // std::advance(face_it_t, 0);
         std::advance(face_it_t, fidx_t);
+
         // compute shortest path distance
         auto result = shortest_paths.shortest_distance_to_source_points(*face_it_t, bary_t);
         distances.push_back(result.first / norm_factor);
@@ -144,4 +146,3 @@ int main(int argc, char** argv) {
 
     return 0;
 }
-
